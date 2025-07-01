@@ -53,14 +53,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class Main extends JavaPlugin {
     public static final Pattern hexpattern = Pattern.compile("#[a-fA-F0-9]{6}");
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(Main.class);
     public static Serialization serialization;
     public static Main instance;
     public static CustomMessageConfig customMessageConfig;
@@ -256,21 +259,56 @@ public class Main extends JavaPlugin {
     }
 
     public static int getVersion() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String p = version.split("_")[1];
-        return Integer.parseInt(p);
+        Logger logger = Bukkit.getLogger();
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        logger.info("Package name: " + packageName);
+        String[] parts = packageName.split("\\.");
+
+        if (parts.length > 3) {
+            String version = parts[3];
+            String[] split = version.split("_");
+
+            if (split.length > 1) {
+                String p = split[1];
+                try {
+                    int versionNumber = Integer.parseInt(p);
+                    logger.info("Version: " + versionNumber);
+                    return versionNumber;
+                } catch (NumberFormatException e) {
+                    logger.warning("Failed to parse version number: " + p);
+                    return 0;
+                }
+            }
+        }
+
+        logger.warning("Version information not found, returning 0");
+        return 0;
     }
     public static int getSubVersion() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String[] split = version.split("_");
-        if (split.length > 2){
-            String s = split[2];
-            String s1 = s.replaceAll("[^\\d.]", "");
-            if (s1.length() > 0){
-                return Integer.parseInt(s1);
+        String packageName = Bukkit.getServer().getClass().getPackage().getName();
+        String[] parts = packageName.split("\\.");
+
+        if (parts.length > 3) {
+            String version = parts[3];
+            String[] split = version.split("_");
+
+            if (split.length > 2) {
+                String s = split[2];
+                String s1 = s.replaceAll("[^\\d.]", "");
+                if (!s1.isEmpty()) {
+                    try {
+                        int subVersion = Integer.parseInt(s1);
+                        Bukkit.getLogger().info("SubVersion: " + subVersion);
+                        return subVersion;
+                    } catch (NumberFormatException e) {
+                        Bukkit.getLogger().warning("SubVersion: 0 (parse error)");
+                        return 0;
+                    }
+                }
             }
-            return 0;
         }
+
+        Bukkit.getLogger().info("SubVersion: 0 (default)");
         return 0;
     }
 
