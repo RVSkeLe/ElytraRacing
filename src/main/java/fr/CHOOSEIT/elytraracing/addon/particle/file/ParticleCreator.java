@@ -65,7 +65,7 @@ public class ParticleCreator {
     private boolean removeFromPlayableSet;
     private String particle;
     private String item;
-    private String[] showWithParticle = new String[]{"", "", ""};
+    private String[] showWithParticle;
     private keyOption[] shapeParticle;
     private keyOption[] colorCreator;
 
