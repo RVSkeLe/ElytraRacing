@@ -256,55 +256,60 @@ public class Main extends JavaPlugin {
     }
 
     public static int getVersion() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String p = version.split("_")[1];
-        return Integer.parseInt(p);
+        String version = Bukkit.getBukkitVersion();
+        String[] parts = version.split("\\.");
+        if (parts.length >= 2) {
+            try {
+                return Integer.parseInt(parts[1]);
+            } catch (NumberFormatException ignored) {}
+        }
+        return -1;
     }
+
     public static int getSubVersion() {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        String[] split = version.split("_");
-        if (split.length > 2){
-            String s = split[2];
-            String s1 = s.replaceAll("[^\\d.]", "");
-            if (s1.length() > 0){
-                return Integer.parseInt(s1);
-            }
-            return 0;
+        String version = Bukkit.getBukkitVersion();
+        String[] parts = version.split("\\.");
+        if (parts.length >= 3) {
+            try {
+                return Integer.parseInt(parts[2]);
+            } catch (NumberFormatException ignored) {}
         }
         return 0;
     }
 
-    public static Class<?> getVersionClass(String firstPart, String secondPart) {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        try {
-            return Class.forName(firstPart + version + secondPart);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static String getVersionClass() {
+        Package pkg = Bukkit.getServer().getClass().getPackage();
+        String name = pkg.getName();
+        String[] parts = name.split("\\.");
+        return parts.length == 4 ? parts[3] : ""; // Pre-1.17: returns "v1_16_R3", post-1.17: returns ""
     }
 
-    public static String getVersionClass() {
-        return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+
+    public static Class<?> getVersionClass(String firstPart, String secondPart) {
+        String version = getVersionClass();
+        String fullClassName = firstPart + (version.isEmpty() ? "" : version + ".") + secondPart;
+        try {
+            return Class.forName(fullClassName);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static Class<?> getNMSClass(String name) {
-        String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        try {
-            return Class.forName("net.minecraft.server." + version + "." + name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+        String version = getVersionClass();
+        return getNMSClass(name, version);
     }
 
     public static Class<?> getNMSClass(String name, String version) {
+        String className = "net.minecraft.server." + version + "." + name;
+
         try {
-            return Class.forName("net.minecraft.server." + version + "." + name);
+            return Class.forName(className);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     private static int getVersion(Player p){
@@ -326,5 +331,3 @@ public class Main extends JavaPlugin {
     }
 
 }
-
-
