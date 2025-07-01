@@ -1,0 +1,32 @@
+# Maven target directory
+/target/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+
+# IntelliJ workspace files
+*.ipr
+
+# IntelliJ misc files
+out/
+*.class
+
+# Eclipse files (just in case)
+.settings/
+*.launch
+*.classpath
+*.project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Maven Wrapper files
+.mvn/wrapper/maven-wrapper.jar
